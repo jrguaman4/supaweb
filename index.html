@@ -2,1285 +2,1290 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control de Personal · PNE Zona 8</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap"
-    rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --navy-900: #0a142b;
-      --navy-800: #0f1d3d;
-      --navy-700: #16294f;
-      --navy-600: #1f3766;
-      --gold: #d4af37;
-      --gold-soft: #e8cf7e;
-      --gold-dim: #9c812a;
-      --ink: #eef2fb;
-      --ink-dim: #9fb0d0;
-      --line: rgba(212, 175, 55, .22);
-      --ok: #3ecf8e;
-      --warn: #e8a33d;
-      --bad: #e0556b;
-      --info: #5b9bd5;
-      --shadow: 0 24px 60px -20px rgba(0, 0, 0, .7);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0
-    }
-
-    html,
-    body {
-      height: 100%
-    }
-
-    body {
-      font-family: 'Spectral', Georgia, serif;
-      color: var(--ink);
-      background:
-        radial-gradient(1100px 600px at 80% -10%, rgba(31, 55, 102, .55), transparent 60%),
-        radial-gradient(900px 500px at -10% 110%, rgba(212, 175, 55, .10), transparent 55%),
-        linear-gradient(160deg, var(--navy-900), var(--navy-800) 60%, #0b1730);
-      background-attachment: fixed;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      opacity: .04;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    }
-
-    h1,
-    h2,
-    h3,
-    .dvz {
-      font-family: 'Oswald', sans-serif;
-      letter-spacing: .04em
-    }
-
-    .wrap {
-      position: relative;
-      z-index: 1;
-      max-width: 1320px;
-      margin: 0 auto;
-      padding: 0 22px 64px
-    }
-
-    /* ---------- HEADER ---------- */
-    header.top {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      padding: 26px 0 22px;
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 8px;
-    }
-
-    .crest {
-      width: 54px;
-      height: 54px;
-      flex: none;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 30%, var(--gold-soft), var(--gold) 45%, var(--gold-dim));
-      display: grid;
-      place-items: center;
-      color: var(--navy-900);
-      font-family: 'Oswald';
-      font-weight: 700;
-      font-size: 1.35rem;
-      box-shadow: 0 0 0 4px rgba(212, 175, 55, .15), 0 8px 22px -6px rgba(212, 175, 55, .5);
-    }
-
-    .top h1 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      line-height: 1
-    }
-
-    .top .sub {
-      font-family: 'Spectral';
-      font-style: italic;
-      color: var(--gold-soft);
-      font-size: .92rem;
-      margin-top: 3px
-    }
-
-    .top .right {
-      margin-left: auto;
-      text-align: right;
-      font-size: .78rem;
-      color: var(--ink-dim)
-    }
-
-    #connDot {
-      display: inline-block;
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--ink-dim);
-      margin-right: 6px;
-      vertical-align: middle
-    }
-
-    #connDot.ok {
-      background: var(--ok);
-      box-shadow: 0 0 8px var(--ok)
-    }
-
-    #connDot.bad {
-      background: var(--bad);
-      box-shadow: 0 0 8px var(--bad)
-    }
-
-    /* ---------- NAV ---------- */
-    nav.menu {
-      display: flex;
-      gap: 6px;
-      margin: 22px 0 30px;
-      flex-wrap: wrap
-    }
-
-    .tab {
-      font-family: 'Oswald';
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      font-size: .85rem;
-      padding: 11px 22px;
-      border: 1px solid var(--line);
-      border-radius: 3px;
-      cursor: pointer;
-      background: rgba(255, 255, 255, .02);
-      color: var(--ink-dim);
-      transition: .25s;
-      position: relative;
-    }
-
-    .tab:hover {
-      color: var(--ink);
-      border-color: var(--gold-dim)
-    }
-
-    .tab.active {
-      color: var(--navy-900);
-      background: linear-gradient(180deg, var(--gold-soft), var(--gold));
-      border-color: var(--gold);
-      font-weight: 600
-    }
-
-    /* ---------- HOME ---------- */
-    .hero {
-      text-align: center;
-      padding: 46px 0 30px;
-      animation: rise .7s ease both
-    }
-
-    .hero h2 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      background: linear-gradient(180deg, #fff, var(--gold-soft));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent
-    }
-
-    .hero p {
-      font-style: italic;
-      color: var(--ink-dim);
-      margin-top: 10px;
-      font-size: 1.05rem
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 22px;
-      margin-top: 34px
-    }
-
-    .card {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 34px 30px;
-      cursor: pointer;
-      background: linear-gradient(160deg, rgba(31, 55, 102, .5), rgba(15, 29, 61, .35));
-      transition: .3s;
-      position: relative;
-      overflow: hidden;
-      animation: rise .7s ease both;
-    }
-
-    .card:nth-child(2) {
-      animation-delay: .1s
-    }
-
-    .card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(120deg, transparent 40%, rgba(212, 175, 55, .08));
-      opacity: 0;
-      transition: .3s
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-      border-color: var(--gold);
-      box-shadow: var(--shadow)
-    }
-
-    .card:hover::after {
-      opacity: 1
-    }
-
-    .card .ic {
-      font-size: 2.4rem;
-      margin-bottom: 14px
-    }
-
-    .card h3 {
-      font-size: 1.3rem;
-      text-transform: uppercase;
-      color: var(--gold-soft)
-    }
-
-    .card p {
-      color: var(--ink-dim);
-      margin-top: 8px;
-      font-size: .96rem;
-      line-height: 1.5
-    }
-
-    /* ---------- KPIs ---------- */
-    .kpis {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 14px;
-      margin-bottom: 24px
-    }
-
-    .kpi {
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 16px 18px;
-      background: rgba(255, 255, 255, .02)
-    }
-
-    .kpi .n {
-      font-family: 'Oswald';
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--gold-soft);
-      line-height: 1
-    }
-
-    .kpi .l {
-      font-size: .78rem;
-      color: var(--ink-dim);
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-top: 6px
-    }
-
-    /* ---------- CONTROLS ---------- */
-    .controls {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
-      align-items: center
-    }
-
-    input,
-    select,
-    textarea {
-      font-family: 'Spectral';
-      font-size: .92rem;
-      color: var(--ink);
-      background: rgba(10, 20, 43, .7);
-      border: 1px solid var(--line);
-      border-radius: 5px;
-      padding: 10px 13px;
-      outline: none;
-      transition: .2s;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(212, 175, 55, .12)
-    }
-
-    select option {
-      background: var(--navy-800)
-    }
-
-    .search {
-      flex: 1;
-      min-width: 220px
-    }
-
-    .btn {
-      font-family: 'Oswald';
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      font-size: .82rem;
-      padding: 10px 18px;
-      border-radius: 5px;
-      border: 1px solid var(--gold);
-      cursor: pointer;
-      transition: .2s;
-      background: linear-gradient(180deg, var(--gold-soft), var(--gold));
-      color: var(--navy-900);
-      font-weight: 600;
-    }
-
-    .btn:hover {
-      filter: brightness(1.08);
-      transform: translateY(-1px)
-    }
-
-    .btn.ghost {
-      background: transparent;
-      color: var(--gold-soft)
-    }
-
-    .btn.ghost:hover {
-      background: rgba(212, 175, 55, .1)
-    }
-
-    .btn.danger {
-      border-color: var(--bad);
-      background: transparent;
-      color: var(--bad)
-    }
-
-    .btn.danger:hover {
-      background: rgba(224, 85, 107, .12)
-    }
-
-    /* ---------- TABLE ---------- */
-    .tablewrap {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: auto;
-      max-height: 64vh;
-      background: rgba(10, 20, 43, .4)
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .88rem;
-      min-width: 900px
-    }
-
-    thead th {
-      position: sticky;
-      top: 0;
-      background: var(--navy-700);
-      font-family: 'Oswald';
-      text-transform: uppercase;
-      font-size: .74rem;
-      letter-spacing: .05em;
-      color: var(--gold-soft);
-      padding: 12px 14px;
-      text-align: left;
-      border-bottom: 2px solid var(--gold-dim);
-      white-space: nowrap;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    thead th:hover {
-      color: #fff
-    }
-
-    tbody td {
-      padding: 11px 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, .05);
-      vertical-align: top
-    }
-
-    tbody tr {
-      transition: .15s
-    }
-
-    tbody tr:hover {
-      background: rgba(212, 175, 55, .06)
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 3px 9px;
-      border-radius: 20px;
-      font-family: 'Oswald';
-      font-size: .7rem;
-      letter-spacing: .04em;
-      text-transform: uppercase
-    }
-
-    .b-present {
-      background: rgba(62, 207, 142, .15);
-      color: var(--ok);
-      border: 1px solid rgba(62, 207, 142, .4)
-    }
-
-    .b-franco {
-      background: rgba(91, 155, 213, .15);
-      color: var(--info);
-      border: 1px solid rgba(91, 155, 213, .4)
-    }
-
-    .b-other {
-      background: rgba(232, 163, 61, .15);
-      color: var(--warn);
-      border: 1px solid rgba(232, 163, 61, .4)
-    }
-
-    .alert-cell {
-      color: var(--warn);
-      font-style: italic;
-      font-size: .82rem
-    }
-
-    .rowact {
-      display: flex;
-      gap: 6px
-    }
-
-    .iconbtn {
-      background: none;
-      border: 1px solid var(--line);
-      color: var(--ink-dim);
-      border-radius: 4px;
-      padding: 5px 9px;
-      cursor: pointer;
-      font-size: .8rem;
-      transition: .2s
-    }
-
-    .iconbtn:hover {
-      color: var(--gold-soft);
-      border-color: var(--gold-dim)
-    }
-
-    .iconbtn.del:hover {
-      color: var(--bad);
-      border-color: var(--bad)
-    }
-
-    /* ---------- DEPENDENCY GROUPS (edit view) ---------- */
-    .depbar {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
-      align-items: center
-    }
-
-    .count-pill {
-      font-family: 'Oswald';
-      font-size: .78rem;
-      color: var(--ink-dim);
-      padding: 4px 12px;
-      border: 1px solid var(--line);
-      border-radius: 20px
-    }
-
-    /* ---------- MODAL ---------- */
-    .overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(5, 10, 22, .78);
-      backdrop-filter: blur(4px);
-      display: none;
-      place-items: center;
-      z-index: 50;
-      padding: 20px
-    }
-
-    .overlay.show {
-      display: grid;
-      animation: fade .2s
-    }
-
-    .modal {
-      width: min(620px, 100%);
-      max-height: 90vh;
-      overflow: auto;
-      border-radius: 10px;
-      background: linear-gradient(160deg, var(--navy-700), var(--navy-800));
-      border: 1px solid var(--gold-dim);
-      box-shadow: var(--shadow);
-      animation: rise .3s ease both;
-    }
-
-    .modal-h {
-      display: flex;
-      align-items: center;
-      padding: 20px 26px;
-      border-bottom: 1px solid var(--line)
-    }
-
-    .modal-h h3 {
-      font-size: 1.25rem;
-      text-transform: uppercase;
-      color: var(--gold-soft)
-    }
-
-    .modal-h .x {
-      margin-left: auto;
-      background: none;
-      border: none;
-      color: var(--ink-dim);
-      font-size: 1.6rem;
-      cursor: pointer;
-      line-height: 1
-    }
-
-    .modal-h .x:hover {
-      color: var(--bad)
-    }
-
-    .form {
-      padding: 24px 26px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px
-    }
-
-    .field.full {
-      grid-column: 1/-1
-    }
-
-    .field label {
-      font-family: 'Oswald';
-      font-size: .74rem;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--ink-dim)
-    }
-
-    .modal-f {
-      padding: 18px 26px;
-      border-top: 1px solid var(--line);
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end
-    }
-
-    /* ---------- DEPENDENCY CARDS (edit view) ---------- */
-    .depgrid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 16px;
-      margin-top: 8px
-    }
-
-    .depcard {
-      position: relative;
-      border-radius: 9px;
-      padding: 20px 20px 18px;
-      cursor: pointer;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      transition: .28s;
-      animation: rise .5s ease both;
-      background: linear-gradient(160deg, rgba(31, 55, 102, .4), rgba(15, 29, 61, .3));
-    }
-
-    .depcard:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow)
-    }
-
-    .depcard .st {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 5px;
-      height: 100%
-    }
-
-    .depcard.done {
-      border-color: rgba(62, 207, 142, .5)
-    }
-
-    .depcard.done .st {
-      background: var(--ok);
-      box-shadow: 0 0 14px var(--ok)
-    }
-
-    .depcard.done:hover {
-      border-color: var(--ok)
-    }
-
-    .depcard.pend {
-      border-color: rgba(224, 85, 107, .5)
-    }
-
-    .depcard.pend .st {
-      background: var(--bad);
-      box-shadow: 0 0 14px var(--bad)
-    }
-
-    .depcard.pend:hover {
-      border-color: var(--bad)
-    }
-
-    .depcard h4 {
-      font-family: 'Oswald';
-      font-size: 1.02rem;
-      text-transform: uppercase;
-      color: var(--ink);
-      line-height: 1.15;
-      margin-bottom: 12px;
-      padding-left: 6px
-    }
-
-    .depcard .meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-left: 6px
-    }
-
-    .depcard .cnt {
-      font-family: 'Oswald';
-      font-size: 1.7rem;
-      font-weight: 700;
-      color: var(--gold-soft);
-      line-height: 1
-    }
-
-    .depcard .cnt small {
-      font-family: 'Spectral';
-      font-style: italic;
-      font-size: .72rem;
-      color: var(--ink-dim);
-      font-weight: 400;
-      display: block;
-      margin-top: 2px
-    }
-
-    .statetag {
-      font-family: 'Oswald';
-      font-size: .66rem;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      padding: 4px 10px;
-      border-radius: 20px
-    }
-
-    .statetag.done {
-      background: rgba(62, 207, 142, .15);
-      color: var(--ok);
-      border: 1px solid rgba(62, 207, 142, .4)
-    }
-
-    .statetag.pend {
-      background: rgba(224, 85, 107, .15);
-      color: var(--bad);
-      border: 1px solid rgba(224, 85, 107, .4)
-    }
-
-    .legend {
-      display: flex;
-      gap: 18px;
-      align-items: center;
-      margin: 4px 0 20px;
-      font-size: .82rem;
-      color: var(--ink-dim);
-      flex-wrap: wrap
-    }
-
-    .legend span {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px
-    }
-
-    .dot {
-      width: 11px;
-      height: 11px;
-      border-radius: 3px
-    }
-
-    .dot.ok {
-      background: var(--ok)
-    }
-
-    .dot.bad {
-      background: var(--bad)
-    }
-
-    .backbtn {
-      font-family: 'Oswald';
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      font-size: .8rem;
-      background: none;
-      border: 1px solid var(--line);
-      color: var(--ink-dim);
-      padding: 8px 16px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: .2s
-    }
-
-    .backbtn:hover {
-      color: var(--gold-soft);
-      border-color: var(--gold-dim)
-    }
-
-    /* ---------- REPORT TABLE (visualize) ---------- */
-    .report-h {
-      font-family: 'Oswald';
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      color: var(--gold-soft);
-      font-size: 1.1rem;
-      margin: 26px 0 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px
-    }
-
-    .report-h .btn {
-      margin-left: auto
-    }
-
-    .rtable {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: auto;
-      background: rgba(10, 20, 43, .4)
-    }
-
-    .rtable table {
-      min-width: auto
-    }
-
-    .rtable thead th {
-      position: sticky;
-      top: 0;
-      background: var(--navy-700)
-    }
-
-    .rtable .est {
-      font-size: .82rem;
-      padding-left: 8px;
-      padding-right: 8px
-    }
-
-    .rtable th.est {
-      font-size: .62rem;
-      white-space: nowrap
-    }
-
-    .rtable td.est.z {
-      color: rgba(159, 176, 208, .25)
-    }
-
-    .rtable tbody td {
-      font-size: .9rem
-    }
-
-    .rtable .num {
-      text-align: right;
-      font-family: 'Oswald';
-      font-weight: 500
-    }
-
-    .rtable tfoot td {
-      padding: 12px 14px;
-      font-family: 'Oswald';
-      text-transform: uppercase;
-      font-size: .82rem;
-      color: var(--gold-soft);
-      border-top: 2px solid var(--gold-dim);
-      background: var(--navy-700)
-    }
-
-    .bar {
-      display: inline-block;
-      height: 7px;
-      border-radius: 4px;
-      background: linear-gradient(90deg, var(--gold-dim), var(--gold-soft));
-      vertical-align: middle;
-      margin-left: 8px
-    }
-
-    /* ---------- MISC ---------- */
-    .empty {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--ink-dim);
-      font-style: italic
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 26px;
-      left: 50%;
-      transform: translateX(-50%) translateY(120px);
-      background: var(--navy-700);
-      border: 1px solid var(--gold);
-      color: var(--ink);
-      padding: 13px 24px;
-      border-radius: 6px;
-      font-family: 'Oswald';
-      letter-spacing: .04em;
-      z-index: 80;
-      transition: .35s;
-      box-shadow: var(--shadow)
-    }
-
-    .toast.show {
-      transform: translateX(-50%) translateY(0)
-    }
-
-    .toast.err {
-      border-color: var(--bad);
-      color: #ffd5db
-    }
-
-    .loader {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(212, 175, 55, .3);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-      vertical-align: middle
-    }
-
-    .view {
-      display: none;
-      animation: fade .4s
-    }
-
-    .view.active {
-      display: block
-    }
-
-    .banner {
-      background: rgba(224, 85, 107, .1);
-      border: 1px solid var(--bad);
-      color: #ffd5db;
-      padding: 14px 18px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-      font-size: .9rem;
-      display: none
-    }
-
-    .banner.show {
-      display: block
-    }
-
-    @keyframes rise {
-      from {
-        opacity: 0;
-        transform: translateY(18px)
-      }
-
-      to {
-        opacity: 1;
-        transform: none
-      }
-    }
-
-    @keyframes fade {
-      from {
-        opacity: 0
-      }
-
-      to {
-        opacity: 1
-      }
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg)
-      }
-    }
-
-    @media(max-width:680px) {
-      .form {
-        grid-template-columns: 1fr
-      }
-
-      .hero h2 {
-        font-size: 1.8rem
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Personal · PNE Zona 8</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --navy-900: #0a142b;
+            --navy-800: #0f1d3d;
+            --navy-700: #16294f;
+            --navy-600: #1f3766;
+            --gold: #d4af37;
+            --gold-soft: #e8cf7e;
+            --gold-dim: #9c812a;
+            --ink: #eef2fb;
+            --ink-dim: #9fb0d0;
+            --line: rgba(212, 175, 55, .22);
+            --ok: #3ecf8e;
+            --warn: #e8a33d;
+            --bad: #e0556b;
+            --info: #5b9bd5;
+            --shadow: 0 24px 60px -20px rgba(0, 0, 0, .7);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            font-family: 'Spectral', Georgia, serif;
+            color: var(--ink);
+            background:
+                radial-gradient(1100px 600px at 80% -10%, rgba(31, 55, 102, .55), transparent 60%),
+                radial-gradient(900px 500px at -10% 110%, rgba(212, 175, 55, .10), transparent 55%),
+                linear-gradient(160deg, var(--navy-900), var(--navy-800) 60%, #0b1730);
+            background-attachment: fixed;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: .04;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        h1,
+        h2,
+        h3,
+        .dvz {
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: .04em
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 0 22px 64px
+        }
+
+        /* ---------- HEADER ---------- */
+        header.top {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 26px 0 22px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 8px;
+        }
+
+        .crest {
+            width: 54px;
+            height: 54px;
+            flex: none;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, var(--gold-soft), var(--gold) 45%, var(--gold-dim));
+            display: grid;
+            place-items: center;
+            color: var(--navy-900);
+            font-family: 'Oswald';
+            font-weight: 700;
+            font-size: 1.35rem;
+                        box-shadow: 0 0 0 4px rgba(212, 175, 55, .15), 0 8px 22px -6px rgba(212, 175, 55, .5);
+        }
+
+        .top h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            line-height: 1
+        }
+
+        .top .sub {
+            font-family: 'Spectral';
+            font-style: italic;
+            color: var(--gold-soft);
+            font-size: .92rem;
+            margin-top: 3px
+        }
+
+        .top .right {
+            margin-left: auto;
+            text-align: right;
+            font-size: .78rem;
+            color: var(--ink-dim)
+        }
+
+        #connDot {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--ink-dim);
+            margin-right: 6px;
+            vertical-align: middle
+        }
+
+        #connDot.ok {
+            background: var(--ok);
+            box-shadow: 0 0 8px var(--ok)
+        }
+
+        #connDot.bad {
+            background: var(--bad);
+            box-shadow: 0 0 8px var(--bad)
+        }
+
+        /* ---------- NAV ---------- */
+        nav.menu {
+            display: flex;
+            gap: 6px;
+            margin: 22px 0 30px;
+            flex-wrap: wrap
+        }
+
+        .tab {
+            font-family: 'Oswald';
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            font-size: .85rem;
+            padding: 11px 22px;
+            border: 1px solid var(--line);
+            border-radius: 3px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, .02);
+            color: var(--ink-dim);
+            transition: .25s;
+            position: relative;
+        }
+
+        .tab:hover {
+            color: var(--ink);
+            border-color: var(--gold-dim)
+        }
+
+        .tab.active {
+            color: var(--navy-900);
+            background: linear-gradient(180deg, var(--gold-soft), var(--gold));
+            border-color: var(--gold);
+            font-weight: 600
+        }
+
+        /* ---------- HOME ---------- */
+        .hero {
+            text-align: center;
+            padding: 46px 0 30px;
+            animation: rise .7s ease both
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #fff, var(--gold-soft));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .hero p {
+            font-style: italic;
+            color: var(--ink-dim);
+            margin-top: 10px;
+            font-size: 1.05rem
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 22px;
+            margin-top: 34px
+        }
+
+        .card {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 34px 30px;
+            cursor: pointer;
+            background: linear-gradient(160deg, rgba(31, 55, 102, .5), rgba(15, 29, 61, .35));
+            transition: .3s;
+            position: relative;
+            overflow: hidden;
+            animation: rise .7s ease both;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: .1s
+        }
+
+        .card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 40%, rgba(212, 175, 55, .08));
+            opacity: 0;
+            transition: .3s
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+            box-shadow: var(--shadow)
+        }
+
+        .card:hover::after {
+            opacity: 1
+        }
+
+        .card .ic {
+            font-size: 2.4rem;
+            margin-bottom: 14px
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            color: var(--gold-soft)
+        }
+
+        .card p {
+            color: var(--ink-dim);
+            margin-top: 8px;
+            font-size: .96rem;
+            line-height: 1.5
+        }
+
+        /* ---------- KPIs ---------- */
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px
+        }
+
+        .kpi {
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 16px 18px;
+            background: rgba(255, 255, 255, .02)
+        }
+
+        .kpi .n {
+            font-family: 'Oswald';
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gold-soft);
+            line-height: 1
+        }
+
+        .kpi .l {
+            font-size: .78rem;
+            color: var(--ink-dim);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-top: 6px
+        }
+
+        /* ---------- CONTROLS ---------- */
+        .controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+            align-items: center
+        }
+
+        input,
+        select,
+        textarea {
+            font-family: 'Spectral';
+            font-size: .92rem;
+            color: var(--ink);
+            background: rgba(10, 20, 43, .7);
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            padding: 10px 13px;
+            outline: none;
+            transition: .2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, .12)
+        }
+
+        select option {
+            background: var(--navy-800)
+        }
+
+        .search {
+            flex: 1;
+            min-width: 220px
+        }
+
+        .btn {
+            font-family: 'Oswald';
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            font-size: .82rem;
+            padding: 10px 18px;
+            border-radius: 5px;
+            border: 1px solid var(--gold);
+            cursor: pointer;
+            transition: .2s;
+            background: linear-gradient(180deg, var(--gold-soft), var(--gold));
+            color: var(--navy-900);
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px)
+        }
+
+        .btn.ghost {
+            background: transparent;
+            color: var(--gold-soft)
+        }
+
+        .btn.ghost:hover {
+            background: rgba(212, 175, 55, .1)
+        }
+
+        .btn.danger {
+            border-color: var(--bad);
+            background: transparent;
+            color: var(--bad)
+        }
+
+        .btn.danger:hover {
+            background: rgba(224, 85, 107, .12)
+        }
+
+        /* ---------- TABLE ---------- */
+        .tablewrap {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: auto;
+            max-height: 64vh;
+            background: rgba(10, 20, 43, .4)
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .88rem;
+            min-width: 900px
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background: var(--navy-700);
+            font-family: 'Oswald';
+            text-transform: uppercase;
+            font-size: .74rem;
+            letter-spacing: .05em;
+            color: var(--gold-soft);
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 2px solid var(--gold-dim);
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        thead th:hover {
+            color: #fff
+        }
+
+        tbody td {
+            padding: 11px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, .05);
+            vertical-align: top
+        }
+
+        tbody tr {
+            transition: .15s
+        }
+
+        tbody tr:hover {
+            background: rgba(212, 175, 55, .06)
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-family: 'Oswald';
+            font-size: .7rem;
+            letter-spacing: .04em;
+            text-transform: uppercase
+        }
+
+        .b-present {
+            background: rgba(62, 207, 142, .15);
+            color: var(--ok);
+            border: 1px solid rgba(62, 207, 142, .4)
+        }
+
+        .b-franco {
+            background: rgba(91, 155, 213, .15);
+            color: var(--info);
+            border: 1px solid rgba(91, 155, 213, .4)
+        }
+
+        .b-other {
+            background: rgba(232, 163, 61, .15);
+            color: var(--warn);
+            border: 1px solid rgba(232, 163, 61, .4)
+        }
+
+        .alert-cell {
+            color: var(--warn);
+            font-style: italic;
+            font-size: .82rem
+        }
+
+        .rowact {
+            display: flex;
+            gap: 6px
+        }
+
+        .iconbtn {
+            background: none;
+            border: 1px solid var(--line);
+            color: var(--ink-dim);
+            border-radius: 4px;
+            padding: 5px 9px;
+            cursor: pointer;
+            font-size: .8rem;
+            transition: .2s
+        }
+
+        .iconbtn:hover {
+            color: var(--gold-soft);
+            border-color: var(--gold-dim)
+        }
+
+        .iconbtn.del:hover {
+            color: var(--bad);
+            border-color: var(--bad)
+        }
+
+        /* ---------- DEPENDENCY GROUPS (edit view) ---------- */
+        .depbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+            align-items: center
+        }
+
+        .count-pill {
+            font-family: 'Oswald';
+            font-size: .78rem;
+            color: var(--ink-dim);
+            padding: 4px 12px;
+            border: 1px solid var(--line);
+            border-radius: 20px
+        }
+
+        /* ---------- MODAL ---------- */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 10, 22, .78);
+            backdrop-filter: blur(4px);
+            display: none;
+            place-items: center;
+            z-index: 50;
+            padding: 20px
+        }
+
+        .overlay.show {
+            display: grid;
+            animation: fade .2s
+        }
+
+        .modal {
+            width: min(620px, 100%);
+            max-height: 90vh;
+            overflow: auto;
+            border-radius: 10px;
+            background: linear-gradient(160deg, var(--navy-700), var(--navy-800));
+            border: 1px solid var(--gold-dim);
+            box-shadow: var(--shadow);
+            animation: rise .3s ease both;
+        }
+
+        .modal-h {
+            display: flex;
+            align-items: center;
+            padding: 20px 26px;
+            border-bottom: 1px solid var(--line)
+        }
+
+        .modal-h h3 {
+            font-size: 1.25rem;
+            text-transform: uppercase;
+            color: var(--gold-soft)
+        }
+
+        .modal-h .x {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--ink-dim);
+            font-size: 1.6rem;
+            cursor: pointer;
+            line-height: 1
+        }
+
+        .modal-h .x:hover {
+            color: var(--bad)
+        }
+
+        .form {
+            padding: 24px 26px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px
+        }
+
+        .field.full {
+            grid-column: 1/-1
+        }
+
+        .field label {
+            font-family: 'Oswald';
+            font-size: .74rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--ink-dim)
+        }
+
+        .modal-f {
+            padding: 18px 26px;
+            border-top: 1px solid var(--line);
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end
+        }
+
+        /* ---------- DEPENDENCY CARDS (edit view) ---------- */
+        .depgrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+            margin-top: 8px
+        }
+
+        .depcard {
+            position: relative;
+            border-radius: 9px;
+            padding: 20px 20px 18px;
+            cursor: pointer;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            transition: .28s;
+            animation: rise .5s ease both;
+            background: linear-gradient(160deg, rgba(31, 55, 102, .4), rgba(15, 29, 61, .3));
+        }
+
+        .depcard:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow)
+        }
+
+        .depcard .st {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%
+        }
+
+        .depcard.done {
+            border-color: rgba(62, 207, 142, .5)
+        }
+
+        .depcard.done .st {
+            background: var(--ok);
+            box-shadow: 0 0 14px var(--ok)
+        }
+
+        .depcard.done:hover {
+            border-color: var(--ok)
+        }
+
+        .depcard.pend {
+            border-color: rgba(224, 85, 107, .5)
+        }
+
+        .depcard.pend .st {
+            background: var(--bad);
+            box-shadow: 0 0 14px var(--bad)
+        }
+
+        .depcard.pend:hover {
+            border-color: var(--bad)
+        }
+
+        .depcard h4 {
+            font-family: 'Oswald';
+            font-size: 1.02rem;
+            text-transform: uppercase;
+            color: var(--ink);
+            line-height: 1.15;
+            margin-bottom: 12px;
+            padding-left: 6px
+        }
+
+        .depcard .meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 6px
+        }
+
+        .depcard .cnt {
+            font-family: 'Oswald';
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: var(--gold-soft);
+            line-height: 1
+        }
+
+        .depcard .cnt small {
+            font-family: 'Spectral';
+            font-style: italic;
+            font-size: .72rem;
+            color: var(--ink-dim);
+            font-weight: 400;
+            display: block;
+            margin-top: 2px
+        }
+
+        .statetag {
+            font-family: 'Oswald';
+            font-size: .66rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            padding: 4px 10px;
+            border-radius: 20px
+        }
+
+        .statetag.done {
+            background: rgba(62, 207, 142, .15);
+            color: var(--ok);
+            border: 1px solid rgba(62, 207, 142, .4)
+        }
+
+        .statetag.pend {
+            background: rgba(224, 85, 107, .15);
+            color: var(--bad);
+            border: 1px solid rgba(224, 85, 107, .4)
+        }
+
+        .legend {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+            margin: 4px 0 20px;
+            font-size: .82rem;
+            color: var(--ink-dim);
+            flex-wrap: wrap
+        }
+
+        .legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px
+        }
+
+        .dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 3px
+        }
+
+        .dot.ok {
+            background: var(--ok)
+        }
+
+        .dot.bad {
+            background: var(--bad)
+        }
+
+        .backbtn {
+            font-family: 'Oswald';
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            font-size: .8rem;
+            background: none;
+            border: 1px solid var(--line);
+            color: var(--ink-dim);
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: .2s
+        }
+
+        .backbtn:hover {
+            color: var(--gold-soft);
+            border-color: var(--gold-dim)
+        }
+
+        /* ---------- REPORT TABLE (visualize) ---------- */
+        .report-h {
+            font-family: 'Oswald';
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--gold-soft);
+            font-size: 1.1rem;
+            margin: 26px 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .report-h .btn {
+            margin-left: auto
+        }
+
+        .rtable {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: auto;
+            background: rgba(10, 20, 43, .4)
+        }
+
+        .rtable table {
+            min-width: auto
+        }
+
+        .rtable thead th {
+            position: sticky;
+            top: 0;
+            background: var(--navy-700)
+        }
+
+        .rtable .est {
+            font-size: .82rem;
+            padding-left: 8px;
+            padding-right: 8px
+        }
+
+        .rtable th.est {
+            font-size: .62rem;
+            white-space: nowrap
+        }
+
+        .rtable td.est.z {
+            color: rgba(159, 176, 208, .25)
+        }
+
+        .rtable tbody td {
+            font-size: .9rem
+        }
+
+        .rtable .num {
+            text-align: right;
+            font-family: 'Oswald';
+            font-weight: 500
+        }
+
+        .rtable tfoot td {
+            padding: 12px 14px;
+            font-family: 'Oswald';
+            text-transform: uppercase;
+            font-size: .82rem;
+            color: var(--gold-soft);
+            border-top: 2px solid var(--gold-dim);
+            background: var(--navy-700)
+        }
+
+        .bar {
+            display: inline-block;
+            height: 7px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--gold-dim), var(--gold-soft));
+            vertical-align: middle;
+            margin-left: 8px
+        }
+
+        /* ---------- MISC ---------- */
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--ink-dim);
+            font-style: italic
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 26px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: var(--navy-700);
+            border: 1px solid var(--gold);
+            color: var(--ink);
+            padding: 13px 24px;
+            border-radius: 6px;
+            font-family: 'Oswald';
+            letter-spacing: .04em;
+            z-index: 80;
+            transition: .35s;
+            box-shadow: var(--shadow)
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0)
+        }
+
+        .toast.err {
+            border-color: var(--bad);
+            color: #ffd5db
+        }
+
+        .loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(212, 175, 55, .3);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            vertical-align: middle
+        }
+
+        .view {
+            display: none;
+            animation: fade .4s
+        }
+
+        .view.active {
+            display: block
+        }
+
+        .banner {
+            background: rgba(224, 85, 107, .1);
+            border: 1px solid var(--bad);
+            color: #ffd5db;
+            padding: 14px 18px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: .9rem;
+            display: none
+        }
+
+        .banner.show {
+            display: block
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(18px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        @keyframes fade {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        @media(max-width:680px) {
+            .form {
+                grid-template-columns: 1fr
+            }
+
+            .hero h2 {
+                font-size: 1.8rem
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <div class="wrap">
+    <div class="wrap">
 
-    <header class="top">
-      <div class="crest">8</div>
-      <div>
-        <h1>Control de Personal</h1>
-        <div class="sub">Policía Nacional del Ecuador · Zona 8 · Talento Humano</div>
-      </div>
-      <div class="right">
-        <div><span id="connDot"></span><span id="connTxt">Conectando…</span></div>
-        <div id="recCount" style="margin-top:4px"></div>
-      </div>
-    </header>
+        <header class="top">
+            
+          <div class="crest">
+  <img src="https://cdn.brandfetch.io/idBMnLXNaD/w/268/h/267/theme/light/logo.png?c=1dxbfHSJFAPEGdCLU4o5B" alt="PNE" style="width: 90%; height: auto;">
+</div>
+            
+            <div>
+                <h1>Parte Diario - DMG</h1>
+                <div class="sub"> Zona 8 · Talento Humano</div>
+            </div>
+            <div class="right">
+                <div><span id="connDot"></span><span id="connTxt">Conectando…</span></div>
+                <div id="recCount" style="margin-top:4px"></div>
+            </div>
+        </header>
 
-    <nav class="menu">
-      <div class="tab active" data-view="home">Inicio</div>
-      <div class="tab" data-view="visual">Visualizar Datos</div>
-      <div class="tab" data-view="edit">Ingresar / Modificar</div>
-    </nav>
+        <nav class="menu">
+            <div class="tab active" data-view="home">Inicio</div>
+            <div class="tab" data-view="visual">Visualizar Datos</div>
+            <div class="tab" data-view="edit">Ingresar / Modificar</div>
+        </nav>
 
-    <div id="cfgBanner" class="banner"></div>
+        <div id="cfgBanner" class="banner"></div>
 
-    <!-- ============ HOME ============ -->
-    <section id="view-home" class="view active">
-      <div class="hero">
-        <h2>Sistema de Gestión</h2>
-      </div>
-      <div class="cards">
-        <div class="card" data-go="visual">
-          <div class="ic">📊</div>
-          <h3>Visualizar Datos</h3>
-          <p>Tabla detallada de todo el personal con búsqueda, filtros por dependencia y estado, ordenamiento y
-            exportación a CSV.</p>
-        </div>
-        <div class="card" data-go="edit">
-          <div class="ic">✎</div>
-          <h3>Ingresar / Modificar</h3>
-          <p>Administra registros agrupados por dependencia: crear, editar y eliminar personal. Los cambios se guardan
-            en la base de datos.</p>
-        </div>
-      </div>
-    </section>
+        <!-- ============ HOME ============ -->
+        <section id="view-home" class="view active">
+            <div class="hero">
+                <h2>Sistema de Gestión</h2>
+            </div>
+            <div class="cards">
+                <div class="card" data-go="visual">
+                    <svg width="120" height="100" viewBox="0 0 24 24" fill="#e8bc3c" xmlns="http://www.w3.org/2000/svg"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+                    <h3>Visualizar Datos</h3>
+                    <p>Tabla detallada de todo el personal con búsqueda, filtros por dependencia y estado, ordenamiento
+                        </p>
+                </div>
+                <div class="card" data-go="edit">
+                    <svg width="100" height="90" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 20C10 14.4772 14.4772 10 20 10H45C50.5228 10 55 14.4772 55 20V30H100C105.523 30 110 34.4772 110 40V80C110 85.5228 105.523 90 100 90H20C14.4772 90 10 85.5228 10 80V20Z" fill="#e8bc3c"/></svg>
+                    <h3>Ingresar / Modificar</h3>
+                    <p>Administra registros agrupados por dependencia: crear, editar y eliminar personal. Los cambios se
+                        guardan.</p>
+                </div>
+            </div>
+             <h2>GNRL. WALTER VILLAROEL TRUJILLO</h2>
+        </section>
 
-    <!-- ============ VISUALIZE ============ -->
-    <section id="view-visual" class="view">
-      <div class="kpis" id="visKpis"></div>
+        <!-- ============ VISUALIZE ============ -->
+        <section id="view-visual" class="view">
+            <div class="kpis" id="visKpis"></div>
 
-      <div class="report-h">
-        Resumen por dependencia
-        <button class="btn" id="vPdf">🖨 Generar PDF de informe</button>
-      </div>
-      <div class="rtable">
-        <table>
-          <thead id="repHead"></thead>
-          <tbody id="repBody"></tbody>
-          <tfoot id="repFoot"></tfoot>
-        </table>
-      </div>
+            <div class="report-h">
+                Resumen por dependencia
+                <button class="btn" id="vPdf">🖨 Generar PDF de informe</button>
+            </div>
+            <div class="rtable">
+                <table>
+                    <thead id="repHead"></thead>
+                    <tbody id="repBody"></tbody>
+                    <tfoot id="repFoot"></tfoot>
+                </table>
+            </div>
 
-      <div class="report-h" style="margin-top:30px">Detalle de personal</div>
-      <div class="controls">
-        <input class="search" id="vSearch" placeholder="Buscar por nombre, cédula, cargo…">
-        <select id="vDep">
-          <option value="">Todas las dependencias</option>
-        </select>
-        <select id="vEstado">
-          <option value="">Todos los estados</option>
-        </select>
-        <button class="btn ghost" id="vExport">⬇ Exportar CSV</button>
-      </div>
-      <div class="tablewrap">
-        <table id="vTable">
-          <thead>
-            <tr>
-              <th data-k="cedula">Cédula</th>
-              <th data-k="grado">Grado</th>
-              <th data-k="nombres">Nombres</th>
-              <th data-k="dependencia">Dependencia</th>
-              <th data-k="cargo_funcion">Cargo / Función</th>
-              <th data-k="novedades_alertas">Novedades / Alertas</th>
-              <th data-k="grupo">Gr.</th>
-              <th data-k="estado">Estado</th>
-              <th data-k="celular">Celular</th>
-            </tr>
-          </thead>
-          <tbody id="vBody"></tbody>
-        </table>
-      </div>
-    </section>
+            <div class="report-h" style="margin-top:30px">Detalle de personal</div>
+            <div class="controls">
+                <input class="search" id="vSearch" placeholder="Buscar por nombre, cédula, cargo…">
+                <select id="vDep">
+                    <option value="">Todas las dependencias</option>
+                </select>
+                <select id="vEstado">
+                    <option value="">Todos los estados</option>
+                </select>
+                <button class="btn ghost" id="vExport">⬇ Exportar CSV</button>
+            </div>
+            <div class="tablewrap">
+                <table id="vTable">
+                    <thead>
+                        <tr>
+                            <th data-k="cedula">Cédula</th>
+                            <th data-k="grado">Grado</th>
+                            <th data-k="nombres">Nombres</th>
+                            <th data-k="dependencia">Dependencia</th>
+                            <th data-k="cargo_funcion">Cargo / Función</th>
+                            <th data-k="novedades_alertas">Novedades / Alertas</th>
+                            <th data-k="grupo">Gr.</th>
+                            <th data-k="estado">Estado</th>
+                            <th data-k="celular">Celular</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vBody"></tbody>
+                </table>
+            </div>
+        </section>
 
-    <!-- ============ EDIT ============ -->
-    <section id="view-edit" class="view">
+        <!-- ============ EDIT ============ -->
+        <section id="view-edit" class="view">
 
-      <!-- Sub-vista: grilla de tarjetas -->
-      <div id="edGrid">
-        <div class="report-h" style="margin-bottom:6px">Dependencias</div>
-        <div class="legend">
-          <span><span class="dot bad"></span> Sin modificar hoy</span>
-          <span><span class="dot ok"></span> Modificada hoy</span>
-        </div>
-        <div class="depgrid" id="depGrid"></div>
-      </div>
+            <!-- Sub-vista: grilla de tarjetas -->
+            <div id="edGrid">
+                <div class="report-h" style="margin-bottom:6px">Dependencias</div>
+                <div class="legend">
+                    <span><span class="dot bad"></span> Sin modificar hoy</span>
+                    <span><span class="dot ok"></span> Modificada hoy</span>
+                </div>
+                <div class="depgrid" id="depGrid"></div>
+            </div>
 
-      <!-- Sub-vista: detalle de una dependencia -->
-      <div id="edDetail" style="display:none">
-        <div class="depbar">
-          <button class="backbtn" id="eBack">← Dependencias</button>
-          <h3 id="eDepTitle" style="font-size:1.15rem;color:var(--gold-soft);text-transform:uppercase"></h3>
-          <input class="search" id="eSearch" placeholder="Buscar…" style="min-width:200px">
-          <span class="count-pill" id="eCount">0 registros</span>
-          <button class="btn" id="eNew">+ Nuevo registro</button>
-        </div>
-        <div class="tablewrap">
-          <table id="eTable">
-            <thead>
-              <tr>
-                <th>Cédula</th>
-                <th>Grado</th>
-                <th>Nombres</th>
-                <th>Cargo / Función</th>
-                <th>Estado</th>
-                <th>Celular</th>
-                <th style="width:90px">Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="eBody"></tbody>
-          </table>
-        </div>
-      </div>
+            <!-- Sub-vista: detalle de una dependencia -->
+            <div id="edDetail" style="display:none">
+                <div class="depbar">
+                    <button class="backbtn" id="eBack">← Dependencias</button>
+                    <h3 id="eDepTitle" style="font-size:1.15rem;color:var(--gold-soft);text-transform:uppercase"></h3>
+                    <input class="search" id="eSearch" placeholder="Buscar…" style="min-width:200px">
+                    <span class="count-pill" id="eCount">0 registros</span>
+                    <button class="btn" id="eNew">+ Nuevo registro</button>
+                </div>
+                <div class="tablewrap">
+                    <table id="eTable">
+                        <thead>
+                            <tr>
+                                <th>Cédula</th>
+                                <th>Grado</th>
+                                <th>Nombres</th>
+                                <th>Cargo / Función</th>
+                                <th>Estado</th>
+                                <th>Celular</th>
+                                <th style="width:90px">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eBody"></tbody>
+                    </table>
+                </div>
+            </div>
 
-    </section>
+        </section>
 
-  </div>
-
-  <!-- ============ MODAL ============ -->
-  <div class="overlay" id="overlay">
-    <div class="modal">
-      <div class="modal-h">
-        <h3 id="mTitle">Nuevo registro</h3>
-        <button class="x" id="mClose">&times;</button>
-      </div>
-      <div class="form">
-        <div class="field"><label>Cédula</label><input id="f_cedula"></div>
-        <div class="field"><label>Grado</label><input id="f_grado" list="gradosList"></div>
-        <div class="field full"><label>Nombres completos</label><input id="f_nombres"></div>
-        <div class="field full"><label>Dependencia</label><select id="f_dependencia"></select></div>
-        <div class="field full"><label>Cargo / Función</label><input id="f_cargo_funcion"></div>
-        <div class="field full"><label>Novedades / Alertas</label><textarea id="f_novedades_alertas"
-            rows="2"></textarea></div>
-        <div class="field"><label>Grupo</label><select id="f_grupo">
-            <option value="">—</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-          </select></div>
-        <div class="field"><label>Estado</label><select id="f_estado"></select></div>
-        <div class="field full"><label>Celular</label><input id="f_celular"></div>
-      </div>
-      <div class="modal-f">
-        <button class="btn ghost" id="mCancel">Cancelar</button>
-        <button class="btn" id="mSave">Guardar</button>
-      </div>
     </div>
-  </div>
 
-  <datalist id="gradosList"></datalist>
-  <div class="toast" id="toast"></div>
+    <!-- ============ MODAL ============ -->
+    <div class="overlay" id="overlay">
+        <div class="modal">
+            <div class="modal-h">
+                <h3 id="mTitle">Nuevo registro</h3>
+                <button class="x" id="mClose">&times;</button>
+            </div>
+            <div class="form">
+                <div class="field"><label>Cédula</label><input id="f_cedula"></div>
+                <div class="field"><label>Grado</label><input id="f_grado" list="gradosList"></div>
+                <div class="field full"><label>Nombres completos</label><input id="f_nombres"></div>
+                <div class="field full"><label>Dependencia</label><select id="f_dependencia"></select></div>
+                <div class="field full"><label>Cargo / Función</label><input id="f_cargo_funcion"></div>
+                <div class="field full"><label>Novedades / Alertas</label><textarea id="f_novedades_alertas"
+                        rows="2"></textarea></div>
+                <div class="field"><label>Grupo</label><select id="f_grupo">
+                        <option value="">—</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                    </select></div>
+                <div class="field"><label>Estado</label><select id="f_estado"></select></div>
+                <div class="field full"><label>Celular</label><input id="f_celular"></div>
+            </div>
+            <div class="modal-f">
+                <button class="btn ghost" id="mCancel">Cancelar</button>
+                <button class="btn" id="mSave">Guardar</button>
+            </div>
+        </div>
+    </div>
 
-  <script>
-    /* =================================================================
-       CONFIGURACIÓN SUPABASE  —  ⚠️ REEMPLAZA ESTOS DOS VALORES
-       Los encuentras en: Supabase -> Project Settings -> API
-       ================================================================= */
-    const SUPABASE_URL = "https://motctnyovuoxdwdxthtv.supabase.co";
-    const SUPABASE_ANON = "sb_publishable_vzkhj0pC3rBIfN8Iccta3Q_MC6oA7W4";
-    const TABLE = "personal";
-    /* ================================================================= */
+    <datalist id="gradosList"></datalist>
+    <div class="toast" id="toast"></div>
 
-    const COLS = ["cedula", "grado", "nombres", "dependencia", "cargo_funcion", "novedades_alertas", "grupo", "estado", "celular"];
-    const ESTADOS = ["PRESENTE", "FRANCO", "SERVICIO", "VACACIONES", "LICENCIA", "COMISION", "PERMISO", "CESE", "PASE", "PCIC", "DESCANSO MEDICO", "TRASLADO TEMPORAL", "TRASLADO OCASIONAL"];
+    <script>
+        /* =================================================================
+           CONFIGURACIÓN SUPABASE  —  ⚠️ REEMPLAZA ESTOS DOS VALORES
+           Los encuentras en: Supabase -> Project Settings -> API
+           ================================================================= */
+        const SUPABASE_URL = "https://motctnyovuoxdwdxthtv.supabase.co";
+        const SUPABASE_ANON = "sb_publishable_vzkhj0pC3rBIfN8Iccta3Q_MC6oA7W4";
+        const TABLE = "personal";
+        /* ================================================================= */
 
-    // Normaliza variantes mal escritas de ESTADO para no duplicar columnas
-    const ESTADO_NORM = {
-      "LICIENCIA": "LICENCIA", "LICENCIA CON REMUNERACION": "LICENCIA",
-      "DESCASO MEDICO": "DESCANSO MEDICO",
-      "TRASLADO OCACIONAL": "TRASLADO OCASIONAL",
-      "SERVICIO (TURNO 24H00)": "SERVICIO"
-    };
-    function normEstado(e) {
-      e = (e || "").trim().toUpperCase();
-      if (!e) return "SIN ESTADO";
-      return ESTADO_NORM[e] || e;
-    }
-    // Lista de estados presentes en los datos, ordenados por frecuencia
-    function estadosPresentes() {
-      const c = {};
-      DATA.forEach(r => { const e = normEstado(r.estado); c[e] = (c[e] || 0) + 1; });
-      return Object.entries(c).sort((a, b) => b[1] - a[1]).map(x => x[0]);
-    }
+        const COLS = ["cedula", "grado", "nombres", "dependencia", "cargo_funcion", "novedades_alertas", "grupo", "estado", "celular"];
+        const ESTADOS = ["PRESENTE", "FRANCO", "SERVICIO", "VACACIONES", "LICENCIA", "COMISION", "PERMISO", "CESE", "PASE", "PCIC", "DESCANSO MEDICO", "TRASLADO TEMPORAL", "TRASLADO OCASIONAL"];
 
-    let sb = null, DATA = [], sortKey = null, sortAsc = true, editingId = null, currentDep = null;
+        // Normaliza variantes mal escritas de ESTADO para no duplicar columnas
+        const ESTADO_NORM = {
+            "LICIENCIA": "LICENCIA", "LICENCIA CON REMUNERACION": "LICENCIA",
+            "DESCASO MEDICO": "DESCANSO MEDICO",
+            "TRASLADO OCACIONAL": "TRASLADO OCASIONAL",
+            "SERVICIO (TURNO 24H00)": "SERVICIO"
+        };
+        function normEstado(e) {
+            e = (e || "").trim().toUpperCase();
+            if (!e) return "SIN ESTADO";
+            return ESTADO_NORM[e] || e;
+        }
+        // Lista de estados presentes en los datos, ordenados por frecuencia
+        function estadosPresentes() {
+            const c = {};
+            DATA.forEach(r => { const e = normEstado(r.estado); c[e] = (c[e] || 0) + 1; });
+            return Object.entries(c).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+        }
 
-    const $ = s => document.querySelector(s), $$ = s => document.querySelectorAll(s);
-    const esc = s => (s == null ? "" : String(s)).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-    const todayStr = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
-    const isToday = ts => { if (!ts) return false; const d = new Date(ts); const l = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); return l === todayStr(); };
+        let sb = null, DATA = [], sortKey = null, sortAsc = true, editingId = null, currentDep = null;
 
-    function toast(msg, err) { const t = $("#toast"); t.textContent = msg; t.className = "toast show" + (err ? " err" : ""); setTimeout(() => t.className = "toast", 2600); }
+        const $ = s => document.querySelector(s), $$ = s => document.querySelectorAll(s);
+        const esc = s => (s == null ? "" : String(s)).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+        const todayStr = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+        const isToday = ts => { if (!ts) return false; const d = new Date(ts); const l = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); return l === todayStr(); };
 
-    /* ---- INIT ---- */
-    function init() {
-      if (SUPABASE_URL.includes("TU-PROYECTO") || SUPABASE_ANON.includes("TU_ANON")) {
-        $("#cfgBanner").className = "banner show";
-        $("#cfgBanner").innerHTML = "⚠️ <b>Falta configurar Supabase.</b> Edita las constantes <code>SUPABASE_URL</code> y <code>SUPABASE_ANON</code> al inicio del &lt;script&gt; con los datos de tu proyecto (Project Settings → API).";
-        setConn(false, "Sin configurar");
-        return;
-      }
-      sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-      loadData();
-    }
-    function setConn(ok, txt) { $("#connDot").className = ok ? "ok" : "bad"; $("#connTxt").textContent = txt; }
+        function toast(msg, err) { const t = $("#toast"); t.textContent = msg; t.className = "toast show" + (err ? " err" : ""); setTimeout(() => t.className = "toast", 2600); }
 
-    async function loadData() {
-      setConn(false, "Cargando… ");
-      $("#connTxt").innerHTML = 'Cargando… <span class="loader"></span>';
-      const { data, error } = await sb.from(TABLE).select("*").order("dependencia").order("nombres");
-      if (error) { setConn(false, "Error de conexión"); toast("Error: " + error.message, true); console.error(error); return; }
-      DATA = data || [];
-      setConn(true, "Conectado");
-      $("#recCount").textContent = DATA.length + " registros";
-      buildSelectors(); renderAll();
-    }
+        /* ---- INIT ---- */
+        function init() {
+            if (SUPABASE_URL.includes("TU-PROYECTO") || SUPABASE_ANON.includes("TU_ANON")) {
+                $("#cfgBanner").className = "banner show";
+                $("#cfgBanner").innerHTML = "⚠️ <b>Falta configurar Supabase.</b> Edita las constantes <code>SUPABASE_URL</code> y <code>SUPABASE_ANON</code> al inicio del &lt;script&gt; con los datos de tu proyecto (Project Settings → API).";
+                setConn(false, "Sin configurar");
+                return;
+            }
+            sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+            loadData();
+        }
+        function setConn(ok, txt) { $("#connDot").className = ok ? "ok" : "bad"; $("#connTxt").textContent = txt; }
 
-    /* ---- SELECTORS ---- */
-    function uniqueDeps() { return [...new Set(DATA.map(r => r.dependencia).filter(Boolean))].sort(); }
-    function buildSelectors() {
-      const deps = uniqueDeps();
-      const estados = [...new Set([...ESTADOS, ...DATA.map(r => r.estado).filter(Boolean)])];
-      fill($("#vDep"), deps, 'Todas las dependencias');
-      fill($("#vEstado"), [...new Set(DATA.map(r => r.estado).filter(Boolean))].sort(), 'Todos los estados');
-      fill($("#f_dependencia"), deps, '', true);
-      fill($("#f_estado"), estados, '', true);
-      const gl = $("#gradosList"); gl.innerHTML = [...new Set(DATA.map(r => r.grado).filter(Boolean))].map(g => `<option value="${esc(g)}">`).join("");
-    }
-    function fill(sel, arr, first, plain) {
-      const cur = sel.value;
-      sel.innerHTML = (first !== undefined ? `<option value="">${first}</option>` : "") + arr.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
-      if (plain && !first) sel.insertAdjacentHTML("afterbegin", '<option value="">—</option>');
-      sel.value = cur;
-    }
+        async function loadData() {
+            setConn(false, "Cargando… ");
+            $("#connTxt").innerHTML = 'Cargando… <span class="loader"></span>';
+            const { data, error } = await sb.from(TABLE).select("*").order("dependencia").order("nombres");
+            if (error) { setConn(false, "Error de conexión"); toast("Error: " + error.message, true); console.error(error); return; }
+            DATA = data || [];
+            setConn(true, "Conectado");
+            $("#recCount").textContent = DATA.length + " registros";
+            buildSelectors(); renderAll();
+        }
 
-    /* ---- BADGES ---- */
-    function badge(e) {
-      e = (e || "").toUpperCase();
-      if (e === "PRESENTE") return `<span class="badge b-present">${esc(e)}</span>`;
-      if (e === "FRANCO") return `<span class="badge b-franco">${esc(e)}</span>`;
-      return e ? `<span class="badge b-other">${esc(e)}</span>` : "";
-    }
+        /* ---- SELECTORS ---- */
+        function uniqueDeps() { return [...new Set(DATA.map(r => r.dependencia).filter(Boolean))].sort(); }
+        function buildSelectors() {
+            const deps = uniqueDeps();
+            const estados = [...new Set([...ESTADOS, ...DATA.map(r => r.estado).filter(Boolean)])];
+            fill($("#vDep"), deps, 'Todas las dependencias');
+            fill($("#vEstado"), [...new Set(DATA.map(r => r.estado).filter(Boolean))].sort(), 'Todos los estados');
+            fill($("#f_dependencia"), deps, '', true);
+            fill($("#f_estado"), estados, '', true);
+            const gl = $("#gradosList"); gl.innerHTML = [...new Set(DATA.map(r => r.grado).filter(Boolean))].map(g => `<option value="${esc(g)}">`).join("");
+        }
+        function fill(sel, arr, first, plain) {
+            const cur = sel.value;
+            sel.innerHTML = (first !== undefined ? `<option value="">${first}</option>` : "") + arr.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
+            if (plain && !first) sel.insertAdjacentHTML("afterbegin", '<option value="">—</option>');
+            sel.value = cur;
+        }
 
-    /* ---- VISUALIZE: KPIs + resumen ---- */
-    function renderVisKpis() {
-      const total = DATA.length;
-      const conNov = DATA.filter(r => (r.novedades_alertas || "").trim()).length;
-      const deps = new Set(DATA.map(r => r.dependencia).filter(Boolean)).size;
-      const present = DATA.filter(r => (r.estado || "").toUpperCase() === "PRESENTE").length;
-      $("#visKpis").innerHTML = [
-        [conNov, "Total con novedades"], [total, "Total personal"],
-        [deps, "Dependencias"], [present, "Presentes"]
-      ].map(([n, l]) => `<div class="kpi"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
-    }
-    function depSummary() {
-      const estados = estadosPresentes();
-      const m = {};
-      DATA.forEach(r => {
-        const d = r.dependencia || "(sin dependencia)";
-        if (!m[d]) { m[d] = { total: 0, nov: 0, est: {} }; estados.forEach(e => m[d].est[e] = 0); }
-        m[d].total++;
-        m[d].est[normEstado(r.estado)] = (m[d].est[normEstado(r.estado)] || 0) + 1;
-        if ((r.novedades_alertas || "").trim()) m[d].nov++;
-      });
-      return { estados, rows: Object.entries(m).map(([dep, v]) => ({ dep, ...v })).sort((a, b) => b.total - a.total) };
-    }
-    function renderSummary() {
-      const { estados, rows } = depSummary();
-      // Cabecera dinámica
-      const head = `<tr><th>Dependencia</th><th class="num">Total</th>` +
-        estados.map(e => `<th class="num est">${esc(e)}</th>`).join("") +
-        `<th class="num">Con nov.</th></tr>`;
-      $("#repHead").innerHTML = head;
-      // Cuerpo
-      $("#repBody").innerHTML = rows.map(r => `<tr>
+        /* ---- BADGES ---- */
+        function badge(e) {
+            e = (e || "").toUpperCase();
+            if (e === "PRESENTE") return `<span class="badge b-present">${esc(e)}</span>`;
+            if (e === "FRANCO") return `<span class="badge b-franco">${esc(e)}</span>`;
+            return e ? `<span class="badge b-other">${esc(e)}</span>` : "";
+        }
+
+        /* ---- VISUALIZE: KPIs + resumen ---- */
+        function renderVisKpis() {
+            const total = DATA.length;
+            const conNov = DATA.filter(r => (r.novedades_alertas || "").trim()).length;
+            const deps = new Set(DATA.map(r => r.dependencia).filter(Boolean)).size;
+            const present = DATA.filter(r => (r.estado || "").toUpperCase() === "PRESENTE").length;
+            $("#visKpis").innerHTML = [
+                [conNov, "Total con novedades"], [total, "Total personal"],
+                [deps, "Dependencias"], [present, "Presentes"]
+            ].map(([n, l]) => `<div class="kpi"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+        }
+        function depSummary() {
+            const estados = estadosPresentes();
+            const m = {};
+            DATA.forEach(r => {
+                const d = r.dependencia || "(sin dependencia)";
+                if (!m[d]) { m[d] = { total: 0, nov: 0, est: {} }; estados.forEach(e => m[d].est[e] = 0); }
+                m[d].total++;
+                m[d].est[normEstado(r.estado)] = (m[d].est[normEstado(r.estado)] || 0) + 1;
+                if ((r.novedades_alertas || "").trim()) m[d].nov++;
+            });
+            return { estados, rows: Object.entries(m).map(([dep, v]) => ({ dep, ...v })).sort((a, b) => b.total - a.total) };
+        }
+        function renderSummary() {
+            const { estados, rows } = depSummary();
+            // Cabecera dinámica
+            const head = `<tr><th>Dependencia</th><th class="num">Total</th>` +
+                estados.map(e => `<th class="num est">${esc(e)}</th>`).join("") +
+                `<th class="num">Con nov.</th></tr>`;
+            $("#repHead").innerHTML = head;
+            // Cuerpo
+            $("#repBody").innerHTML = rows.map(r => `<tr>
     <td>${esc(r.dep)}</td>
     <td class="num">${r.total}</td>
     ${estados.map(e => `<td class="num est ${r.est[e] ? '' : 'z'}">${r.est[e] || ""}</td>`).join("")}
     <td class="num" style="color:${r.nov ? 'var(--warn)' : 'var(--ink-dim)'}">${r.nov}</td>
   </tr>`).join("");
-      // Totales generales
-      const tot = {}; estados.forEach(e => tot[e] = 0);
-      DATA.forEach(r => tot[normEstado(r.estado)] = (tot[normEstado(r.estado)] || 0) + 1);
-      const tt = DATA.length, tn = DATA.filter(r => (r.novedades_alertas || "").trim()).length;
-      $("#repFoot").innerHTML = `<tr><td>Total general (${rows.length} deps.)</td><td class="num">${tt}</td>` +
-        estados.map(e => `<td class="num est">${tot[e] || 0}</td>`).join("") +
-        `<td class="num">${tn}</td></tr>`;
-    }
+            // Totales generales
+            const tot = {}; estados.forEach(e => tot[e] = 0);
+            DATA.forEach(r => tot[normEstado(r.estado)] = (tot[normEstado(r.estado)] || 0) + 1);
+            const tt = DATA.length, tn = DATA.filter(r => (r.novedades_alertas || "").trim()).length;
+            $("#repFoot").innerHTML = `<tr><td>Total general (${rows.length} deps.)</td><td class="num">${tt}</td>` +
+                estados.map(e => `<td class="num est">${tot[e] || 0}</td>`).join("") +
+                `<td class="num">${tn}</td></tr>`;
+        }
 
-    /* ---- VISUALIZE: tabla detalle ---- */
-    function visRows() {
-      let r = [...DATA];
-      const q = $("#vSearch").value.trim().toLowerCase();
-      const d = $("#vDep").value, e = $("#vEstado").value;
-      if (d) r = r.filter(x => x.dependencia === d);
-      if (e) r = r.filter(x => x.estado === e);
-      if (q) r = r.filter(x => COLS.some(c => (x[c] || "").toString().toLowerCase().includes(q)));
-      if (sortKey) r.sort((a, b) => { const av = (a[sortKey] || "").toString().toLowerCase(), bv = (b[sortKey] || "").toString().toLowerCase(); return (av < bv ? -1 : av > bv ? 1 : 0) * (sortAsc ? 1 : -1); });
-      return r;
-    }
-    function renderVisual() {
-      renderVisKpis();
-      renderSummary();
-      const rows = visRows();
-      $("#vBody").innerHTML = rows.length ? rows.map(r => `<tr>
+        /* ---- VISUALIZE: tabla detalle ---- */
+        function visRows() {
+            let r = [...DATA];
+            const q = $("#vSearch").value.trim().toLowerCase();
+            const d = $("#vDep").value, e = $("#vEstado").value;
+            if (d) r = r.filter(x => x.dependencia === d);
+            if (e) r = r.filter(x => x.estado === e);
+            if (q) r = r.filter(x => COLS.some(c => (x[c] || "").toString().toLowerCase().includes(q)));
+            if (sortKey) r.sort((a, b) => { const av = (a[sortKey] || "").toString().toLowerCase(), bv = (b[sortKey] || "").toString().toLowerCase(); return (av < bv ? -1 : av > bv ? 1 : 0) * (sortAsc ? 1 : -1); });
+            return r;
+        }
+        function renderVisual() {
+            renderVisKpis();
+            renderSummary();
+            const rows = visRows();
+            $("#vBody").innerHTML = rows.length ? rows.map(r => `<tr>
     <td>${esc(r.cedula)}</td><td>${esc(r.grado)}</td><td>${esc(r.nombres)}</td>
     <td>${esc(r.dependencia)}</td><td>${esc(r.cargo_funcion)}</td>
     <td class="alert-cell">${esc(r.novedades_alertas)}</td><td>${esc(r.grupo)}</td>
     <td>${badge(r.estado)}</td><td>${esc(r.celular)}</td></tr>`).join("")
-        : `<tr><td colspan="9" class="empty">Sin resultados para los filtros aplicados.</td></tr>`;
-    }
+                : `<tr><td colspan="9" class="empty">Sin resultados para los filtros aplicados.</td></tr>`;
+        }
 
-    /* ---- EDIT: grilla de tarjetas por dependencia ---- */
-    function depModified(dep) {
-      // verde si algún registro de la dependencia fue actualizado hoy
-      return DATA.some(r => r.dependencia === dep && isToday(r.actualizado_en));
-    }
-    function renderDepGrid() {
-      const deps = uniqueDeps();
-      $("#depGrid").innerHTML = deps.map((dep, i) => {
-        const count = DATA.filter(r => r.dependencia === dep).length;
-        const done = depModified(dep);
-        return `<div class="depcard ${done ? 'done' : 'pend'}" style="animation-delay:${i * 0.03}s" onclick="openDep('${esc(dep).replace(/'/g, "\\'")}')">
+        /* ---- EDIT: grilla de tarjetas por dependencia ---- */
+        function depModified(dep) {
+            // verde si algún registro de la dependencia fue actualizado hoy
+            return DATA.some(r => r.dependencia === dep && isToday(r.actualizado_en));
+        }
+        function renderDepGrid() {
+            const deps = uniqueDeps();
+            $("#depGrid").innerHTML = deps.map((dep, i) => {
+                const count = DATA.filter(r => r.dependencia === dep).length;
+                const done = depModified(dep);
+                return `<div class="depcard ${done ? 'done' : 'pend'}" style="animation-delay:${i * 0.03}s" onclick="openDep('${esc(dep).replace(/'/g, "\\'")}')">
       <span class="st"></span>
       <h4>${esc(dep)}</h4>
       <div class="meta">
@@ -1288,117 +1293,117 @@
         <span class="statetag ${done ? 'done' : 'pend'}">${done ? '✓ Modificada' : '● Pendiente'}</span>
       </div>
     </div>`;
-      }).join("");
-    }
+            }).join("");
+        }
 
-    /* ---- EDIT: detalle de una dependencia ---- */
-    function editRows() {
-      const q = $("#eSearch").value.trim().toLowerCase();
-      let r = DATA.filter(x => x.dependencia === currentDep);
-      if (q) r = r.filter(x => COLS.some(c => (x[c] || "").toString().toLowerCase().includes(q)));
-      return r;
-    }
-    function renderEditDetail() {
-      if (!currentDep) return;
-      $("#eDepTitle").textContent = currentDep;
-      const rows = editRows();
-      $("#eCount").textContent = rows.length + " registro" + (rows.length === 1 ? "" : "s");
-      $("#eBody").innerHTML = rows.length ? rows.map(r => `<tr>
+        /* ---- EDIT: detalle de una dependencia ---- */
+        function editRows() {
+            const q = $("#eSearch").value.trim().toLowerCase();
+            let r = DATA.filter(x => x.dependencia === currentDep);
+            if (q) r = r.filter(x => COLS.some(c => (x[c] || "").toString().toLowerCase().includes(q)));
+            return r;
+        }
+        function renderEditDetail() {
+            if (!currentDep) return;
+            $("#eDepTitle").textContent = currentDep;
+            const rows = editRows();
+            $("#eCount").textContent = rows.length + " registro" + (rows.length === 1 ? "" : "s");
+            $("#eBody").innerHTML = rows.length ? rows.map(r => `<tr>
     <td>${esc(r.cedula)}</td><td>${esc(r.grado)}</td><td>${esc(r.nombres)}</td>
     <td>${esc(r.cargo_funcion)}</td><td>${badge(r.estado)}</td><td>${esc(r.celular)}</td>
     <td><div class="rowact">
       <button class="iconbtn" onclick="openEdit(${r.id})" title="Editar">✎</button>
       <button class="iconbtn del" onclick="delRow(${r.id})" title="Eliminar">🗑</button>
     </div></td></tr>`).join("")
-        : `<tr><td colspan="7" class="empty">No hay registros en esta dependencia.</td></tr>`;
-    }
-    window.openDep = function (dep) {
-      currentDep = dep;
-      $("#eSearch").value = "";
-      $("#edGrid").style.display = "none";
-      $("#edDetail").style.display = "block";
-      renderEditDetail();
-    };
-    function backToGrid() {
-      currentDep = null;
-      $("#edDetail").style.display = "none";
-      $("#edGrid").style.display = "block";
-      renderDepGrid();
-    }
-    function renderEdit() {
-      if (currentDep) { renderEditDetail(); }
-      else { renderDepGrid(); }
-    }
-    function renderAll() { renderVisual(); renderEdit(); }
+                : `<tr><td colspan="7" class="empty">No hay registros en esta dependencia.</td></tr>`;
+        }
+        window.openDep = function (dep) {
+            currentDep = dep;
+            $("#eSearch").value = "";
+            $("#edGrid").style.display = "none";
+            $("#edDetail").style.display = "block";
+            renderEditDetail();
+        };
+        function backToGrid() {
+            currentDep = null;
+            $("#edDetail").style.display = "none";
+            $("#edGrid").style.display = "block";
+            renderDepGrid();
+        }
+        function renderEdit() {
+            if (currentDep) { renderEditDetail(); }
+            else { renderDepGrid(); }
+        }
+        function renderAll() { renderVisual(); renderEdit(); }
 
-    /* ---- MODAL ---- */
-    function openModal() { $("#overlay").className = "overlay show"; }
-    function closeModal() { $("#overlay").className = "overlay"; }
-    function openNew() {
-      editingId = null; $("#mTitle").textContent = "Nuevo registro";
-      COLS.forEach(c => $("#f_" + c).value = "");
-      if (currentDep) $("#f_dependencia").value = currentDep;
-      openModal();
-    }
-    window.openEdit = function (id) {
-      const r = DATA.find(x => x.id === id); if (!r) return;
-      editingId = id; $("#mTitle").textContent = "Editar registro";
-      COLS.forEach(c => $("#f_" + c).value = r[c] || "");
-      openModal();
-    };
-    async function saveRow() {
-      const rec = {}; COLS.forEach(c => rec[c] = $("#f_" + c).value.trim() || null);
-      if (!rec.nombres) { toast("El nombre es obligatorio", true); return; }
-      $("#mSave").disabled = true; $("#mSave").textContent = "Guardando…";
-      let res;
-      if (editingId) res = await sb.from(TABLE).update(rec).eq("id", editingId).select();
-      else res = await sb.from(TABLE).insert(rec).select();
-      $("#mSave").disabled = false; $("#mSave").textContent = "Guardar";
-      if (res.error) { toast("Error: " + res.error.message, true); return; }
-      const row = res.data[0];
-      if (editingId) { const i = DATA.findIndex(x => x.id === editingId); DATA[i] = row; }
-      else DATA.push(row);
-      closeModal(); buildSelectors(); renderAll();
-      $("#recCount").textContent = DATA.length + " registros";
-      toast(editingId ? "Registro actualizado" : "Registro creado");
-    };
-    window.delRow = async function (id) {
-      const r = DATA.find(x => x.id === id);
-      if (!confirm("¿Eliminar a " + (r ? r.nombres : "este registro") + "? Esta acción no se puede deshacer.")) return;
-      const { error } = await sb.from(TABLE).delete().eq("id", id);
-      if (error) { toast("Error: " + error.message, true); return; }
-      DATA = DATA.filter(x => x.id !== id); renderAll(); buildSelectors();
-      $("#recCount").textContent = DATA.length + " registros";
-      toast("Registro eliminado");
-    };
+        /* ---- MODAL ---- */
+        function openModal() { $("#overlay").className = "overlay show"; }
+        function closeModal() { $("#overlay").className = "overlay"; }
+        function openNew() {
+            editingId = null; $("#mTitle").textContent = "Nuevo registro";
+            COLS.forEach(c => $("#f_" + c).value = "");
+            if (currentDep) $("#f_dependencia").value = currentDep;
+            openModal();
+        }
+        window.openEdit = function (id) {
+            const r = DATA.find(x => x.id === id); if (!r) return;
+            editingId = id; $("#mTitle").textContent = "Editar registro";
+            COLS.forEach(c => $("#f_" + c).value = r[c] || "");
+            openModal();
+        };
+        async function saveRow() {
+            const rec = {}; COLS.forEach(c => rec[c] = $("#f_" + c).value.trim() || null);
+            if (!rec.nombres) { toast("El nombre es obligatorio", true); return; }
+            $("#mSave").disabled = true; $("#mSave").textContent = "Guardando…";
+            let res;
+            if (editingId) res = await sb.from(TABLE).update(rec).eq("id", editingId).select();
+            else res = await sb.from(TABLE).insert(rec).select();
+            $("#mSave").disabled = false; $("#mSave").textContent = "Guardar";
+            if (res.error) { toast("Error: " + res.error.message, true); return; }
+            const row = res.data[0];
+            if (editingId) { const i = DATA.findIndex(x => x.id === editingId); DATA[i] = row; }
+            else DATA.push(row);
+            closeModal(); buildSelectors(); renderAll();
+            $("#recCount").textContent = DATA.length + " registros";
+            toast(editingId ? "Registro actualizado" : "Registro creado");
+        };
+        window.delRow = async function (id) {
+            const r = DATA.find(x => x.id === id);
+            if (!confirm("¿Eliminar a " + (r ? r.nombres : "este registro") + "? Esta acción no se puede deshacer.")) return;
+            const { error } = await sb.from(TABLE).delete().eq("id", id);
+            if (error) { toast("Error: " + error.message, true); return; }
+            DATA = DATA.filter(x => x.id !== id); renderAll(); buildSelectors();
+            $("#recCount").textContent = DATA.length + " registros";
+            toast("Registro eliminado");
+        };
 
-    /* ---- EXPORT ---- */
-    function exportCSV() {
-      const rows = visRows();
-      const head = COLS.join(",");
-      const body = rows.map(r => COLS.map(c => { let v = (r[c] == null ? "" : String(r[c])); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(",")).join("\n");
-      const blob = new Blob(["\ufeff" + head + "\n" + body], { type: "text/csv;charset=utf-8" });
-      const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-      a.download = "personal_z8_" + new Date().toISOString().slice(0, 10) + ".csv"; a.click();
-      toast(rows.length + " registros exportados");
-    }
+        /* ---- EXPORT ---- */
+        function exportCSV() {
+            const rows = visRows();
+            const head = COLS.join(",");
+            const body = rows.map(r => COLS.map(c => { let v = (r[c] == null ? "" : String(r[c])); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(",")).join("\n");
+            const blob = new Blob(["\ufeff" + head + "\n" + body], { type: "text/csv;charset=utf-8" });
+            const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+            a.download = "personal_z8_" + new Date().toISOString().slice(0, 10) + ".csv"; a.click();
+            toast(rows.length + " registros exportados");
+        }
 
-    /* ---- INFORME PDF (vía impresión del navegador) ---- */
-    function generarPDF() {
-      const resp = prompt("Nombre del Oficial de Semana:", "");
-      if (resp === null) return;
-      const oficial = resp.trim();
-      const { estados, rows } = depSummary();
-      const tt = DATA.length, tn = DATA.filter(r => (r.novedades_alertas || "").trim()).length;
-      const fecha = new Date().toLocaleDateString("es-EC", { year: "numeric", month: "long", day: "numeric" });
-      const tot = {}; estados.forEach(e => tot[e] = 0);
-      DATA.forEach(r => tot[normEstado(r.estado)] = (tot[normEstado(r.estado)] || 0) + 1);
-      const thEst = estados.map(e => `<th class="n est">${esc(e)}</th>`).join("");
-      const filas = rows.map(r => `<tr><td>${esc(r.dep)}</td><td class="n">${r.total}</td>` +
-        estados.map(e => `<td class="n">${r.est[e] || ""}</td>`).join("") +
-        `<td class="n">${r.nov}</td></tr>`).join("");
-      const footEst = estados.map(e => `<td class="n">${tot[e] || 0}</td>`).join("");
-      const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe de Personal - PNE Zona 8</title>
+        /* ---- INFORME PDF (vía impresión del navegador) ---- */
+        function generarPDF() {
+            const resp = prompt("Nombre del Oficial de Semana:", "");
+            if (resp === null) return;
+            const oficial = resp.trim();
+            const { estados, rows } = depSummary();
+            const tt = DATA.length, tn = DATA.filter(r => (r.novedades_alertas || "").trim()).length;
+            const fecha = new Date().toLocaleDateString("es-EC", { year: "numeric", month: "long", day: "numeric" });
+            const tot = {}; estados.forEach(e => tot[e] = 0);
+            DATA.forEach(r => tot[normEstado(r.estado)] = (tot[normEstado(r.estado)] || 0) + 1);
+            const thEst = estados.map(e => `<th class="n est">${esc(e)}</th>`).join("");
+            const filas = rows.map(r => `<tr><td>${esc(r.dep)}</td><td class="n">${r.total}</td>` +
+                estados.map(e => `<td class="n">${r.est[e] || ""}</td>`).join("") +
+                `<td class="n">${r.nov}</td></tr>`).join("");
+            const footEst = estados.map(e => `<td class="n">${tot[e] || 0}</td>`).join("");
+            const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe de Personal - PNE Zona 8</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:'Segoe UI',Arial,sans-serif;color:#16294f;padding:30px 36px}
@@ -1448,33 +1453,33 @@
     <div class="ft">Documento generado automáticamente · Sistema de Control de Personal · Zona 8</div>
     <script>window.onload=function(){window.print();}<\/script>
   </body></html>`;
-      const w = window.open("", "_blank");
-      if (!w) { toast("Permite las ventanas emergentes para generar el PDF", true); return; }
-      w.document.write(html); w.document.close();
-    }
+            const w = window.open("", "_blank");
+            if (!w) { toast("Permite las ventanas emergentes para generar el PDF", true); return; }
+            w.document.write(html); w.document.close();
+        }
 
-    /* ---- NAV ---- */
-    function show(v) {
-      $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.view === v));
-      $$(".view").forEach(s => s.classList.toggle("active", s.id === "view-" + v));
-    }
+        /* ---- NAV ---- */
+        function show(v) {
+            $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.view === v));
+            $$(".view").forEach(s => s.classList.toggle("active", s.id === "view-" + v));
+        }
 
-    /* ---- EVENTS ---- */
-    $$(".tab").forEach(t => t.onclick = () => show(t.dataset.view));
-    $$(".card").forEach(c => c.onclick = () => show(c.dataset.go));
-    $("#vSearch").oninput = renderVisual; $("#vDep").onchange = renderVisual; $("#vEstado").onchange = renderVisual;
-    $("#vExport").onclick = exportCSV;
-    $("#vPdf").onclick = generarPDF;
-    $("#eBack").onclick = backToGrid;
-    $("#eSearch").oninput = renderEditDetail;
-    $("#eNew").onclick = openNew;
-    $("#mClose").onclick = closeModal; $("#mCancel").onclick = closeModal; $("#mSave").onclick = saveRow;
-    $("#overlay").onclick = e => { if (e.target === $("#overlay")) closeModal(); };
-    $$("#vTable thead th").forEach(th => th.onclick = () => { const k = th.dataset.k; if (sortKey === k) sortAsc = !sortAsc; else { sortKey = k; sortAsc = true; } renderVisual(); });
-    document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+        /* ---- EVENTS ---- */
+        $$(".tab").forEach(t => t.onclick = () => show(t.dataset.view));
+        $$(".card").forEach(c => c.onclick = () => show(c.dataset.go));
+        $("#vSearch").oninput = renderVisual; $("#vDep").onchange = renderVisual; $("#vEstado").onchange = renderVisual;
+        $("#vExport").onclick = exportCSV;
+        $("#vPdf").onclick = generarPDF;
+        $("#eBack").onclick = backToGrid;
+        $("#eSearch").oninput = renderEditDetail;
+        $("#eNew").onclick = openNew;
+        $("#mClose").onclick = closeModal; $("#mCancel").onclick = closeModal; $("#mSave").onclick = saveRow;
+        $("#overlay").onclick = e => { if (e.target === $("#overlay")) closeModal(); };
+        $$("#vTable thead th").forEach(th => th.onclick = () => { const k = th.dataset.k; if (sortKey === k) sortAsc = !sortAsc; else { sortKey = k; sortAsc = true; } renderVisual(); });
+        document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 
-    init();
-  </script>
+        init();
+    </script>
 </body>
 
 </html>
